@@ -4,7 +4,7 @@ with open("README.md", "r") as f:
     long_description = f.read()
 
 setuptools.setup(
-    name="pdf-to-scan-apurvmishra99",
+    name="pdf-to-scan",
     version="0.0.1",
     author="Apurv Mishra",
     author_email="me@apurvmishra.com",
@@ -13,10 +13,18 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/apurvmishra99/pdf-to-scan",
     packages=setuptools.find_packages(),
+    include_package_data=True,
+    install_requires=[
+        'Click',
+    ],
+    entry_points='''
+        [console_scripts]
+        pdf-to-scan=pdf_to_scan.make_pdfs_look_scanned:convert
+    ''',
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
+        "Operating System :: Linux/macOS",
     ],
     python_requires='>=3.4',
 )

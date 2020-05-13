@@ -41,6 +41,7 @@ def convert(file_name):
         cmd_gs = ['gs', '-dSAFER', '-dBATCH', '-dNOPAUSE', '-dNOCACHE', '-sDEVICE=pdfwrite', '-sColorConversionStrategy=LeaveColorUnchanged', '-dAutoFilterColorImages=true',
                 '-dAutoFilterGrayImages=true', '-dDownsampleMonoImages=true', '-dDownsampleGrayImages=true', '-dDownsampleColorImages=true', f'-sOutputFile={output_path_final}', output_path]
         subprocess.call(cmd_gs, shell=False)
+        click.secho("File processed and saved", fg="green")
     except Exception as e:
         print(e)
         
