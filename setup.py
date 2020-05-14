@@ -8,7 +8,7 @@ setuptools.setup(
     version="0.0.3",
     author="Apurv Mishra",
     author_email="me@apurvmishra.com",
-    description="A small script to make your pdfs seem handscanned",
+    description="A small script to make your pdfs seem scanned",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/apurvmishra99/pdf-to-scan",
