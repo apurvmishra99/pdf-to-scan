@@ -5,7 +5,7 @@ with open("README.md", "r") as f:
 
 setuptools.setup(
     name="pdf-to-scan",
-    version="0.0.1",
+    version="0.0.3",
     author="Apurv Mishra",
     author_email="me@apurvmishra.com",
     description="A small script to make your pdfs seem handscanned",
@@ -16,6 +16,8 @@ setuptools.setup(
     include_package_data=True,
     install_requires=[
         'Click',
+        'ghostscript',
+        'Wand'
     ],
     entry_points='''
         [console_scripts]
@@ -24,7 +26,7 @@ setuptools.setup(
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
-        "Operating System :: Linux/macOS",
+        "Operating System :: OS Independent",
     ],
-    python_requires='>=3.4',
+    python_requires='>=3.6',
 )

@@ -9,20 +9,10 @@ import os
 import subprocess
 from pathlib import Path
 import click
+import locale
+import ghostscript
+from wand.image import Image
 
-
-def check_dependencies():
-    # Check paths to ImageMagick and Ghostscript. 
-    # Assuming it's kept in /usr/local/bin or /usr/bin in
-    # Mac + Homebrew and linux distros.
-
-    GHOSTSCRIPT_PATH = [os.path.exists(candidate) for candidate in ['/usr/local/bin/gs', '/usr/bin/gs']]
-    CONVERT_PATH = [os.path.exists(candidate) for candidate in ['/usr/local/bin/convert', '/usr/bin/convert']]
-    
-    if not any(CONVERT_PATH):
-        raise Exception('Check ImageMagick installation.')
-    if not any(GHOSTSCRIPT_PATH):
-        raise Exception('Check GhostScript installation.')
     
 @click.command()
 @click.argument(
@@ -30,17 +20,24 @@ def check_dependencies():
     type=click.Path(exists=True)
 )
 def convert(file_name):
-    check_dependencies()
     try:
-        orig_file = Path(file_name)
-        output_path = Path(f"{file_name.split('.')[0]}_.pdf")
-        output_path_final = Path(f"{file_name.split('.')[0]}.pdf")
-        cmd = ['convert', '-density', '150', orig_file, '-colorspace', 'gray', '-linear-stretch', '3.5%x10%',
-            '-blur', '0x0.5', '-attenuate', '0.25', '+noise', 'Gaussian', '-rotate', '0.5', output_path]
-        subprocess.call(cmd, shell=False)
+        orig_file = Path(file_name).resolve()
+        output_path = Path(f"{file_name.split('.')[0]}_.pdf").resolve()
+        output_path_temp = Path(f"{file_name.split('.')[0]}__.pdf").resolve()
+        with Image(filename=str(orig_file), resolution=150) as img:
+            img.transform_colorspace('gray')
+            img.linear_stretch(black_point=0.035, white_point=0.1)
+            img.blur(radius=0, sigma=0.5)
+            img.noise(noise_type='gaussian', attenuate=0.25)
+            img.rotate(0.5)
+            img.save(filename=str(output_path))    
+        
         cmd_gs = ['gs', '-dSAFER', '-dBATCH', '-dNOPAUSE', '-dNOCACHE', '-sDEVICE=pdfwrite', '-sColorConversionStrategy=LeaveColorUnchanged', '-dAutoFilterColorImages=true',
-                '-dAutoFilterGrayImages=true', '-dDownsampleMonoImages=true', '-dDownsampleGrayImages=true', '-dDownsampleColorImages=true', f'-sOutputFile={output_path_final}', output_path]
-        subprocess.call(cmd_gs, shell=False)
+                '-dAutoFilterGrayImages=true', '-dDownsampleMonoImages=true', '-dDownsampleGrayImages=true', '-dDownsampleColorImages=true', f'-sOutputFile={str(output_path_temp)}', str(output_path)]
+        encoding = locale.getpreferredencoding()
+        cmd_gs = [a.encode(encoding) for a in cmd_gs]
+        ghostscript.Ghostscript(*cmd_gs)
+        os.remove(str(output_path_temp))
         click.secho("File processed and saved", fg="green")
     except Exception as e:
         print(e)
